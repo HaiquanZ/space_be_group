@@ -1,0 +1,26 @@
+{
+  "name": "space_be_group",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HaiquanZ/space_be_group.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/HaiquanZ/space_be_group/issues"
+  },
+  "homepage": "https://github.com/HaiquanZ/space_be_group#readme",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.1",
+    "mongoose": "^8.3.2",
+    "nodemon": "^3.1.0"
+  }
+}
