@@ -14,12 +14,38 @@ module.exports = (app) => {
       };
       const result = await groupSrv.CreateGroup({ name, img, describe, user });
       return res.json({
-        status: 'success',
+        status: "success",
         data: {
-            message: 'Group created successfully!',
-            group: result
-        }
+          message: "Group created successfully!",
+          group: result,
+        },
       });
+    } catch (err) {
+      console.log(err);
+      next(err);
+    }
+  });
+
+  app.delete("/group", async (req, res, next) => {
+    try {
+        const result = await groupSrv.DeleteGroup({ groupId: req.body.groupId});
+
+        if (result.deletedCount) {
+          return res.status(200).json({
+            status: "success",
+            data: {
+              message: "Delete group successfully!"
+            },
+          });
+        }else{
+          return res.status(404).json({
+            status: "fail",
+            data: {
+              message: "Delete group failed or group is not existed!"
+            },
+          });
+        }
+
     } catch (err) {
       console.log(err);
       next(err);
@@ -49,4 +75,69 @@ module.exports = (app) => {
       next(err);
     }
   });
+
+  app.get('/member', async (req, res, next) => {
+    try{
+      const group = await groupSrv.GetDetailGroup({groupId: req.body.groupId});
+      const { size, page} = req.body;
+      //handle paging
+      let members = [];
+      if(size*(page - 1) <= group.members.length && group.members.length != 0){
+        for(let i = size*(page - 1); i < size*page; i++){
+          if(i < group.members.length){
+            members.push(group.members[i]);
+          }
+        }
+      }
+
+      return res.status(200).json({
+        status: "success",
+        data: {
+          totalRecord: group.members.length,
+          totalPage: Math.ceil((group.members.length) / size),
+          page: page,
+          members
+        }
+      });
+    }catch (err) {
+      console.log(err);
+      next(err);
+    }
+  })
+
+  app.delete('/member', async (req, res, next) => {
+    try{
+      const group = await groupSrv.GetDetailGroup(req.body);
+      let indexToRemove = -1;
+      for(let i=0; i < group.members.length; i++){
+        if(group.members[i].id == req.body.userId){
+          indexToRemove = i;
+          break;
+        }
+      }
+
+      if(indexToRemove == undefined) {
+        return res.status(404).json({
+          status: 'fail',
+          data: {
+            message: "This user is not exist in group."
+          }
+        })
+      }else{
+        group.members.splice(indexToRemove, 1);
+        const result = await groupSrv.UpdateGroup(group, req.body.groupId);
+        // console.log('result: ', result);
+
+        return res.status(200).json({
+          staus: 'success',
+          data: {
+            result
+          }
+        })
+      }
+    }catch (err) {
+      console.log(err);
+      next(err);
+    }
+  })
 };
