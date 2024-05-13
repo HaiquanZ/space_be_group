@@ -13,7 +13,7 @@ module.exports = (app) => {
         id: req.body.user.id,
       };
       const result = await groupSrv.CreateGroup({ name, img, describe, user });
-      return res.json({
+      return res.status(201).json({
         status: "success",
         data: {
           message: "Group created successfully!",

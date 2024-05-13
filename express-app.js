@@ -3,6 +3,7 @@ const cors  = require('cors');
 
 const handleError = require('./api/middlewares/handle-error');
 const groupController = require('./api/controllers/groupController');
+const postController = require('./api/controllers/postController');
 
 
 module.exports = async (app) => {
@@ -14,6 +15,7 @@ module.exports = async (app) => {
 
     //api
     groupController(app);
+    postController(app);
 
     // error handling
     app.use(handleError);
