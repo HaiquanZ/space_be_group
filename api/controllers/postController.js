@@ -105,4 +105,33 @@ module.exports = (app) => {
       next(err);
     }
   })
+
+  app.post('/post/comment', async (req, res, next) => {
+    try{
+      const result = await postSrv.CreateComment({
+        postId: req.body.postId,
+        isReply: req.body.isReply,
+        commentId: req.body.commentId,
+        comment: {
+          content: req.body.content,
+          auth: {
+            avt: req.body.user.avatar,
+            id: req.body.user.id,
+            name: req.body.user.name
+          }
+        }
+      });
+
+      return res.status(201).json({
+        status: "success",
+        data: {
+          message: 'Comment successfully!'
+        }
+      });
+    }catch (err) {
+      console.log(err);
+      next(err);
+    }
+  });
+
 };

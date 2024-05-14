@@ -68,5 +68,35 @@ class PostService{
             console.log(e);
         }
     }
+
+    async CreateComment(data){
+        try{
+            if(data.isReply){
+                const post = await PostModel.findOne({ _id: data.postId});
+                if(!post){
+                    return Error('Can not find post.');
+                }
+                //handle add reply
+                for(let i=0; i<post.comments.length;i++){
+                    if(data.commentId == post.comments[i]._id){
+                        post.comments[i].replys.push(data.comment);
+                        break;
+                    }
+                }
+                // console.log(post);
+                post.save();
+                return post;
+            }else{
+                const result = await PostModel.findOneAndUpdate(
+                    { _id: data.postId},
+                    { $push: { comments: data.comment}},
+                    { new: true }
+                )
+                return result;
+            }
+        }catch(e){
+            console.log(e);
+        }
+    }
 }
 module.exports = PostService;
