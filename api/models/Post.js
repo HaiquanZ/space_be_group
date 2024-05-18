@@ -30,7 +30,8 @@ const PostSchema = new Schema({
   auth: AuthSchema,
   isAssignment: Boolean,
   comments: [CommentSchema],
-  reacts: [AuthSchema]
+  reacts: [AuthSchema],
+  createdAt: { type: Date, default: Date.now },
 });
 
 module.exports = mongoose.model("posts", PostSchema);

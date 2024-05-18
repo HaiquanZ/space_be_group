@@ -26,9 +26,9 @@ module.exports = (app) => {
     }
   });
 
-  app.delete("/group", async (req, res, next) => {
+  app.delete("/", async (req, res, next) => {
     try {
-        const result = await groupSrv.DeleteGroup({ groupId: req.body.groupId});
+        const result = await groupSrv.DeleteGroup({ groupId: req.query.groupId});
 
         if (result.deletedCount) {
           return res.status(200).json({
@@ -136,6 +136,52 @@ module.exports = (app) => {
         })
       }
     }catch (err) {
+      console.log(err);
+      next(err);
+    }
+  })
+
+  app.get('/', async (req, res, next) => {
+    try{
+      const groups = await groupSrv.GetListGroup({
+        id: req.query.id
+      });
+      const { size, page} = req.query;
+      //handle paging
+      let members = [];
+      if(size*(page - 1) <= groups.length && groups.length != 0){
+        for(let i = size*(page - 1); i < size*page; i++){
+          if(i < groups.length){
+            members.push(groups[i]);
+          }
+        }
+      }
+
+      return res.status(200).json({
+        status: "success",
+        data: {
+          totalRecord: groups.length,
+          totalPage: Math.ceil((groups.length) / size),
+          page: page,
+          groups: members
+        }
+      });
+    }catch (err) {
+      console.log(err);
+      next(err);
+    }
+  })
+
+  app.get('/detail', async(req, res, next) => {
+    try{
+      const result = await groupSrv.GetDetailGroup({groupId: req.query.groupId});
+      return res.status(200).json({
+        status: "success",
+        data: {
+          group: result
+        }
+      })
+    }catch(err){
       console.log(err);
       next(err);
     }

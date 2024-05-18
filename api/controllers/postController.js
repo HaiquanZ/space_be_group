@@ -15,6 +15,7 @@ module.exports = (app) => {
         auth: auth,
         content: req.body.content,
         groupId: req.body.groupId,
+        isAssignment: req.body.isAssignment
       });
 
       return res.status(201).json({
@@ -58,7 +59,7 @@ module.exports = (app) => {
   app.get('/post', async(req, res, next) => {
     try{
       const posts = await postSrv.GetPostByGroup({ groupId: req.query.groupId});
-      const { size, page } = req.body;
+      const { size, page } = req.query;
       let data = [];
       if(size*(page - 1) <= posts.length && posts.length != 0){
         for(let i = size*(page - 1); i < size*page; i++){
@@ -81,6 +82,21 @@ module.exports = (app) => {
       next(err);
     }
   });
+
+  app.get('/post/detail', async(req, res, next) => {
+    try{
+      const result = await postSrv.GetDetailPost({postId: req.query.postId});
+      return res.status(200).json({
+        status: 'success',
+        data: {
+          post: result
+        }
+      })
+    }catch (err) {
+      console.log(err);
+      next(err);
+    }
+  })
 
   app.post('/post/react', async(req, res, next) => {
     try{
@@ -111,7 +127,7 @@ module.exports = (app) => {
       const result = await postSrv.CreateComment({
         postId: req.body.postId,
         isReply: req.body.isReply,
-        commentId: req.body.commentId,
+        commentId: req.body.commentId ? req.body.commentId : null,
         comment: {
           content: req.body.content,
           auth: {
@@ -133,5 +149,26 @@ module.exports = (app) => {
       next(err);
     }
   });
+
+  app.delete('/post/comment', async (req, res, next) => {
+    try{
+      const result = await postSrv.DeleteComment({
+        postId: req.body.postId,
+        isReply: req.body.isReply,
+        commentId: req.body.commentId,
+        replyId: req.body.replyId ? req.body.replyId : null
+      })
+
+      return res.status(200).json({
+        status: 'success',
+        data: {
+          result
+        }
+      })
+    }catch(err){
+      console.log(err);
+      next(err);
+    }
+  })
 
 };

@@ -85,6 +85,15 @@ class GroupService {
       console.log(err);
     }
   }
+
+  async GetListGroup(data){
+    try{
+      const groups = GroupModel.find({'members.id': data.id});
+      return groups;
+    }catch (err){
+      console.log(err);
+    }
+  }
 }
 
 module.exports = GroupService;

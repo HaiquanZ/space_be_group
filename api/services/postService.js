@@ -7,12 +7,23 @@ class PostService{
                 content: data.content,
                 idGroup: data.groupId,
                 auth: data.auth,
-                isAssignment: false,
+                isAssignment: data.isAssignment,
                 comments: [],
                 reacts: []
             })
 
             const result = post.save();
+            return result;
+        }catch(e){
+            console.log(e);
+        }
+    }
+
+    async GetDetailPost(data){
+        try{
+            const result = await PostModel.findOne({
+                _id: data.postId
+            })
             return result;
         }catch(e){
             console.log(e);
@@ -32,7 +43,7 @@ class PostService{
 
     async GetPostByGroup(data){
         try{
-            const posts = await PostModel.find({ idGroup: data.groupId});
+            const posts = await PostModel.find({ idGroup: data.groupId}).sort({ createdAt: -1});
             return posts;
         }catch(e){
             console.log(e);
@@ -96,6 +107,39 @@ class PostService{
             }
         }catch(e){
             console.log(e);
+            throw new Error(e);
+        }
+    }
+
+    async DeleteComment(data){
+        try{
+            const post = await PostModel.findOne({ _id: data.postId });
+            if(data.isReply){
+                for(let i=0; i < post.comments.length;i++){
+                    if(data.commentId == post.comments[i]._id){
+                        for(let j=0; j<post.comments[i].replys.length;j++){
+                            if(data.replyId == post.comments[i].replys[j]._id){
+                                post.comments[i].replys.splice(j,1);
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }
+                post.save();
+                return 'Deleted successfully.'
+            }else{
+                for(let i=0; i < post.comments.length;i++){
+                    if(data.commentId == post.comments[i]._id){
+                        post.comments.splice(i,1);
+                        break;
+                    }
+                }
+                post.save();
+                return 'Deleted successfully.';
+            }
+        }catch(e){
+
         }
     }
 }
