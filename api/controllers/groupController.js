@@ -1,7 +1,9 @@
 const GroupService = require("../services/groupService");
+const PostService = require('../services/postService');
 
 module.exports = (app) => {
   const groupSrv = new GroupService();
+  const postSrv = new PostService();
 
   app.post("/create", async (req, res, next) => {
     try {
@@ -181,6 +183,22 @@ module.exports = (app) => {
           group: result
         }
       })
+    }catch(err){
+      console.log(err);
+      next(err);
+    }
+  })
+
+  app.get('/members-post', async(req, res, next) => {
+    try{
+      const tmp = await postSrv.GetDetailPost({ postId: req.query.postId});
+      const result = await groupSrv.GetDetailGroup({ groupId: tmp.idGroup});
+      return res.status(200).json({
+        status: "success",
+        data: {
+          members: result.members
+        }
+      });
     }catch(err){
       console.log(err);
       next(err);

@@ -22,7 +22,7 @@ module.exports = (app) => {
         status: "success",
         data: {
           message: "Post created successfully!",
-          group: result,
+          post: result,
         },
       });
     } catch (err) {
