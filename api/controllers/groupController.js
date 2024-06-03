@@ -109,10 +109,10 @@ module.exports = (app) => {
 
   app.delete('/member', async (req, res, next) => {
     try{
-      const group = await groupSrv.GetDetailGroup(req.body);
+      const group = await groupSrv.GetDetailGroup(req.query);
       let indexToRemove = -1;
       for(let i=0; i < group.members.length; i++){
-        if(group.members[i].id == req.body.userId){
+        if(group.members[i].id == req.query.userId){
           indexToRemove = i;
           break;
         }
@@ -127,7 +127,7 @@ module.exports = (app) => {
         })
       }else{
         group.members.splice(indexToRemove, 1);
-        const result = await groupSrv.UpdateGroup(group, req.body.groupId);
+        const result = await groupSrv.UpdateGroup(group, req.query.groupId);
         // console.log('result: ', result);
 
         return res.status(200).json({

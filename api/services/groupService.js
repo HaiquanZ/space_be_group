@@ -53,18 +53,20 @@ class GroupService {
   }
 
   async AddMember(data) {
-    try {
-      const result = GroupModel.findOneAndUpdate(
-        { _id: data.groupId },
-        { $push: { members: { $each: data.users } } },
-        { new: true }
-      );
-
-      return result;
-    } catch (err) {
-      console.log(err);
-      ////next(err);
+    //check if Member is already exists
+    const group = await GroupModel.findOne({_id: data.groupId}).lean();
+    const check = group.members.find(item => item.id == data.users[0].id);
+    if(check){
+      throw new Error('User already exists in group');
     }
+    //add member
+    const result = GroupModel.findOneAndUpdate(
+      { _id: data.groupId },
+      { $push: { members: { $each: data.users } } },
+      { new: true }
+    );
+
+    return result;
   }
 
   async GetDetailGroup(data){
@@ -79,7 +81,7 @@ class GroupService {
   async DeleteMember(data){
     try{
       const group = GroupModel.findById(data.groupId);
-      console.log(group.json());
+      // console.log(group.json());
       // return result;
     }catch (err){
       console.log(err);
